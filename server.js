@@ -11,7 +11,6 @@ require("./routes/comment.routes.js")(app);
 require("./routes/label.routes.js")(app);
 require("./routes/auth.routes.js")(app);
 
-
 const db = require("./models");
 db.sequelize
   .sync()
