@@ -1,7 +1,7 @@
 const db = require("../models");
 const Task = db.task;
 const authJwt = require("../middleware/authJwt.js");
-
+const logger = require("../logger/index.js");
 
 exports.findAll = (req, res) => {
   authJwt.verifyToken(req, res, () => {
@@ -10,13 +10,15 @@ exports.findAll = (req, res) => {
     Task.findAll({
       where: {
         is_completed: false,
-        username: authenticatedUsername, 
+        username: authenticatedUsername,
       },
     })
       .then((data) => res.send(data))
       .catch((err) => {
+        const message = "Some error occurred while retrieving Tasks.";
+        logger.error(message);
         res.status(500).send({
-          message: err.message || "Some error occurred while retrieving Tasks.",
+          message: err.message || message,
         });
       });
   });
@@ -25,9 +27,11 @@ exports.findAll = (req, res) => {
 exports.create = (req, res) => {
   authJwt.verifyToken(req, res, () => {
     const authenticatedUsername = req.userId;
+    const message = "Content can not be empty! 'id' is required.";
     if (!req.body.id) {
+      logger.error(message);
       res.status(400).send({
-        message: "Content can not be empty! 'id' is required.",
+        message: message,
       });
       return;
     }
@@ -42,26 +46,28 @@ exports.create = (req, res) => {
       parent_id: req.body.parent_id || null,
       order: req.body.order || null,
       priority: req.body.priority || null,
-      due: req.body.due || {}, 
+      due: req.body.due || {},
       url: req.body.url || null,
       comment_count: req.body.comment_count || 0,
       created_at: req.body.created_at || 0,
       creator_id: req.body.creator_id || 0,
       assignee_id: req.body.assignee_id || 0,
       assigner_id: req.body.assigner_id || 0,
-      duration: req.body.duration || {}, 
-      username:authenticatedUsername
+      duration: req.body.duration || {},
+      username: authenticatedUsername,
     };
-
 
     Task.create(task)
       .then((data) => {
         res.send(data);
       })
       .catch((err) => {
+        const message = "Some error occurred while creating the Task.";
         res.status(500).send({
-          message: err.message || "Some error occurred while creating the Task.",
+          message: err.message || message,
         });
+
+        logger.error(message);
       });
   });
 };
@@ -81,19 +87,22 @@ exports.update = (req, res) => {
             message: "Task was updated successfully.",
           });
         } else {
+          const message = `Cannot update Task with id=${id}. Maybe Task was not found or req.body is empty.`;
           res.status(404).send({
-            message: `Cannot update Task with id=${id}. Maybe Task was not found or req.body is empty.`,
+            message: message,
           });
+          logger.error(message);
         }
       })
       .catch((err) => {
+        const message = "Error updating task with id=" + id;
         res.status(500).send({
-          message: "Error updating task with id=" + id,
+          message: message,
         });
+        logger.error(message);
       });
   });
 };
-
 
 exports.delete = (req, res) => {
   authJwt.verifyToken(req, res, () => {
@@ -101,8 +110,10 @@ exports.delete = (req, res) => {
 
     const id = req.params.id;
     if (!id) {
+      const message = "Invalid request. Please provide a valid task ID.";
+      logger.error(message);
       return res.status(400).send({
-        message: "Invalid request. Please provide a valid task ID.",
+        message: message,
       });
     }
 
@@ -111,19 +122,24 @@ exports.delete = (req, res) => {
     })
       .then((num) => {
         if (num == 1) {
+          const message = "Task was deleted successfully!";
           res.send({
-            message: "Task was deleted successfully!",
+            message: message,
           });
+          logger.error(message);
         } else {
+          const message = `Cannot delete task with id=${id}. Maybe task was not found or does not belong to the authenticated user.`;
           res.send({
-            message: `Cannot delete task with id=${id}. Maybe task was not found or does not belong to the authenticated user.`,
+            message: message,
           });
+          logger.error(message);
         }
       })
       .catch((err) => {
-        console.error("Error deleting task:", err);
+        const message = "Error deleting task:";
+        logger.error(message, err);
         res.status(500).send({
-          message: "Internal server error while deleting the task.",
+          message: message,
         });
       });
   });
@@ -135,8 +151,10 @@ exports.findOne = (req, res) => {
 
     const id = req.params.id;
     if (!id) {
+      const message = "Invalid request. Please provide a valid task ID.";
+      logger.error(message);
       return res.status(400).send({
-        message: "Invalid request. Please provide a valid task ID.",
+        message: message,
       });
     }
     Task.findOne({
@@ -146,13 +164,16 @@ exports.findOne = (req, res) => {
         if (data) {
           res.send(data);
         } else {
+          const message = `Cannot find active task with id=${id} or task does not belong to the authenticated user.`;
           res.status(404).send({
-            message: `Cannot find active task with id=${id} or task does not belong to the authenticated user.`,
+            message: message,
           });
+          logger.error(message);
         }
       })
       .catch((err) => {
-        console.error("Error retrieving task:", err);
+        const message = "Internal server error while retrieving the task.";
+        logger.error(message, err);
         res.status(500).send({
           message: "Internal server error while retrieving the task.",
         });
@@ -167,16 +188,20 @@ exports.toggle = (req, res) => {
     const taskId = req.params.id;
 
     if (!taskId) {
+      const message = "Invalid request. Please provide a valid task ID.";
+      logger.error(message);
       return res.status(400).send({
-        message: "Invalid request. Please provide a valid task ID.",
+        message: message,
       });
     }
-    
+
     Task.findByPk(taskId)
       .then((task) => {
+        const message = `Cannot find Task with id=${taskId} or Task does not belong to the authenticated user.`;
         if (!task || task.username !== authenticatedUsername) {
+          logger.error(message);
           return res.status(404).send({
-            message: `Cannot find Task with id=${taskId} or Task does not belong to the authenticated user.`,
+            message: message,
           });
         }
 
@@ -198,9 +223,10 @@ exports.toggle = (req, res) => {
         });
       })
       .catch((err) => {
-        console.error("Error toggling task status:", err);
+        logger.error("Error toggling task status:", err);
+        const message = `Internal server error while toggling Task status with id=${taskId}.`;
         res.status(500).send({
-          message: `Internal server error while toggling Task status with id=${taskId}.`,
+          message: message,
         });
       });
   });

@@ -4,6 +4,7 @@ const User = db.user;
 
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
+const logger = require("../logger");
 
 exports.signup = (req, res) => {
   User.create({
@@ -15,6 +16,7 @@ exports.signup = (req, res) => {
       res.send({ message: "User was registered successfully" });
     })
     .catch((err) => {
+      logger.error(err);
       res.send({ message: err.message });
     });
 };
@@ -27,15 +29,22 @@ exports.signin = (req, res) => {
   })
     .then((user) => {
       if (!user) {
-        return res.status(404).send({ message: "User Not found." });
+        const message = "User Not found.";
+        logger.error(message);
+        return res.status(404).send({ message: message });
       }
 
-      var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
+      var passwordIsValid = bcrypt.compareSync(
+        req.body.password,
+        user.password
+      );
 
       if (!passwordIsValid) {
+        const message = "Invalid Password!";
+        logger.error(message);
         return res.status(401).send({
           accessToken: null,
-          message: "Invalid Password!",
+          message: message,
         });
       }
 
@@ -45,10 +54,12 @@ exports.signin = (req, res) => {
         expiresIn: 86400,
       });
 
-      return res.status(200).send({ message: "Login Successfully", accessToken: token });
+      return res
+        .status(200)
+        .send({ message: "Login Successfully", accessToken: token });
     })
     .catch((err) => {
-      console.error(err);
+      logger.error(err);
       res.status(500).send({ message: "Internal Server Error" });
     });
 };

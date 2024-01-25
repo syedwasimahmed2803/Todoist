@@ -1,4 +1,4 @@
-module.exports= (sequelize, Sequelize) => {
+module.exports = (sequelize, Sequelize) => {
   const Project = sequelize.define("project", {
     id: {
       type: Sequelize.STRING,
@@ -39,11 +39,12 @@ module.exports= (sequelize, Sequelize) => {
     },
     username: {
       type: Sequelize.STRING,
-      allowNull:false,
+      allowNull: false,
       references: {
-        model: 'users', // This should match the name of the Project model
-        key: 'username',
-      },},
+        model: "users",
+        key: "username",
+      },
+    },
   });
   return Project;
 };

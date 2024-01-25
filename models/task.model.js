@@ -1,4 +1,3 @@
-
 module.exports = (sequelize, Sequelize) => {
   const Task = sequelize.define("task", {
     id: {
@@ -7,11 +6,12 @@ module.exports = (sequelize, Sequelize) => {
     },
     project_id: {
       type: Sequelize.STRING,
-      allowNull:false,
+      allowNull: false,
       references: {
-        model: 'projects', // This should match the name of the Project model
-        key: 'id',
-      },},
+        model: "projects",
+        key: "id",
+      },
+    },
     section_id: {
       type: Sequelize.STRING,
     },
@@ -62,11 +62,12 @@ module.exports = (sequelize, Sequelize) => {
     },
     username: {
       type: Sequelize.STRING,
-      allowNull:false,
+      allowNull: false,
       references: {
-        model: 'users', // This should match the name of the Project model
-        key: 'username',
-      },},
+        model: "users", // This should match the name of the Project model
+        key: "username",
+      },
+    },
   });
   return Task;
 };

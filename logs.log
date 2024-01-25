@@ -1,0 +1,12 @@
+2024-01-24 16:58:14 [31merror[39m: Failed to sync db: password authentication failed for user "postgres"
+2024-01-24 16:59:52 [31merror[39m: Failed to sync db: password authentication failed for user "postgres"
+2024-01-24 17:03:12 [31merror[39m: Failed to sync db: password authentication failed for user "postgres"
+2024-01-24 17:03:39 [31merror[39m: Failed to sync db: password authentication failed for user "postgres"
+2024-01-24 17:04:33 [31merror[39m: Failed to sync db: password authentication failed for user "postgres"
+2024-01-25 10:51:36 [33mwarn[39m: Failed! Username is already in use!
+2024-01-25 10:51:57 [31merror[39m: User Not found.
+2024-01-25 10:52:04 [31merror[39m: User Not found.
+2024-01-25 10:52:12 [33mwarn[39m: Unauthorized!
+2024-01-25 10:54:17 [33mwarn[39m: Unauthorized!
+2024-01-25 10:54:30 [31merror[39m: Cannot find Project with id=3. Project not found for the authenticated user.
+2024-01-25 10:55:22 [33mwarn[39m: Unauthorized! Invalid token

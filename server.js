@@ -1,7 +1,6 @@
 const express = require("express");
-const bodyParser = require("body-parser");
 const cors = require("cors");
-
+const logger = require("./logger/index.js");
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -18,7 +17,7 @@ db.sequelize
     console.log("Synced db.");
   })
   .catch((err) => {
-    console.log("Failed to sync db: " + err.message);
+    logger.error("Failed to sync db: " + err.message);
   });
 
 app.get("/", (req, res) => {

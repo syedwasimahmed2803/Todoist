@@ -1,34 +1,41 @@
-const db =require("../models");
-const User=db.user;
+const db = require("../models");
+const logger = require("../logger/index");
+const User = db.user;
 
-checkDuplicateUsernameOrEmail = (req,res,next) => {
+checkDuplicateUsernameOrEmail = (req, res, next) => {
+  User.findOne({
+    where: {
+      username: req.body.username,
+    },
+  }).then((user) => {
+    if (user) {
+      const message = "Failed! Username is already in use!";
+      res.status(400).send({
+        message: message,
+      });
+      logger.warn(message);
+      return;
+    }
     User.findOne({
-        where:{
-            username:req.body.username
-        }
-    }).then(user => {
-        if(user){
-            res.status(400).send({
-                message:"Failed! Username is already in use!"
-            })
-            return ;
-        }
-        User.findOne({
-            where:{
-                email:req.body.email
-            }
-        }).then(user => {
-            if(user){
-                res.status(400).send({
-                    message:"Failed! Email is already in use"
-                })
-                return ;
-            }
-            next();
-        })
-    })
-}
+      where: {
+        email: req.body.email,
+      },
+    }).then((user) => {
+      if (user) {
+        const message = "Failed! Email is already in use";
+        res.status(400).send({
+          message: message,
+        });
+        logger.warn(message);
+        return;
+      }
+      next();
+    });
+  });
+};
 
-const verifySignUp={checkDuplicateUsernameOrEmail: checkDuplicateUsernameOrEmail};
+const verifySignUp = {
+  checkDuplicateUsernameOrEmail: checkDuplicateUsernameOrEmail,
+};
 
-module.exports=verifySignUp
+module.exports = verifySignUp;

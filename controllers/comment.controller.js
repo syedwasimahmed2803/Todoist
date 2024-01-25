@@ -12,7 +12,7 @@ exports.findAll = (req, res) => {
     })
       .then((data) => res.send(data))
       .catch((err) => {
-        console.error("Error retrieving comments:", err);
+        logger.error("Error retrieving comments:", err);
         res.status(500).send({
           message: "Internal server error while retrieving comments.",
         });
@@ -24,8 +24,10 @@ exports.create = (req, res) => {
   authJwt.verifyToken(req, res, () => {
     const authenticatedUsername = req.userId;
     if (!req.body.id) {
+      const message = "Content can not be empty!";
+      logger.error(message);
       res.status(400).send({
-        message: "Content can not be empty!",
+        message: message,
       });
       return;
     }
@@ -37,7 +39,7 @@ exports.create = (req, res) => {
       posted_at: req.body.posted_at ? req.body.posted_at : null,
       content: req.body.content,
       attachment: req.body.attachment ? req.body.attachment : null,
-      username:authenticatedUsername
+      username: authenticatedUsername,
     };
 
     Task.findByPk(comment.task_id)
@@ -45,7 +47,10 @@ exports.create = (req, res) => {
         if (task && task.username === authenticatedUsername) {
           return Comment.create(comment);
         } else {
-          throw new Error("Task not found or does not belong to the authenticated user.");
+          const message =
+            "Task not found or does not belong to the authenticated user.";
+          logger.error(message);
+          throw new Error(message);
         }
       })
       .then((createdComment) => {
@@ -56,7 +61,9 @@ exports.create = (req, res) => {
           task.comment_count += 1;
           return task.save();
         } else {
-          throw new Error("Task not found.");
+          const message = "Task not found.";
+          logger.error(message);
+          throw new Error(message);
         }
       })
       .then((data) => {
@@ -70,9 +77,10 @@ exports.create = (req, res) => {
         res.send(data);
       })
       .catch((err) => {
-        console.error("Error creating comment:", err);
+        logger.error("Error creating comment:", err);
         res.status(500).send({
-          message: err.message || "Some error occurred while creating the Comment.",
+          message:
+            err.message || "Some error occurred while creating the Comment.",
         });
       });
   });
@@ -92,13 +100,15 @@ exports.update = (req, res) => {
             message: "Comment was updated successfully.",
           });
         } else {
+          const message = `Cannot update Comment with id=${id}. Maybe Comment was not found or does not belong to the authenticated user.`;
+          logger.error(message);
           res.send({
-            message: `Cannot update Comment with id=${id}. Maybe Comment was not found or does not belong to the authenticated user.`,
+            message: message,
           });
         }
       })
       .catch((err) => {
-        console.error("Error updating comment:", err);
+        logger.error("Error updating comment:", err);
         res.status(500).send({
           message: `Internal server error while updating Comment with id=${id}.`,
         });
@@ -114,14 +124,18 @@ exports.delete = (req, res) => {
     Comment.findByPk(commentId)
       .then((comment) => {
         if (!comment || comment.username !== authenticatedUsername) {
+          const message = `Comment with id=${commentId} not found or does not belong to the authenticated user.`;
+          logger.error(message);
           return res.status(404).send({
-            message: `Comment with id=${commentId} not found or does not belong to the authenticated user.`,
+            message: message,
           });
         }
 
         const taskId = comment.task_id;
 
-        Comment.destroy({ where: { id: commentId, username: authenticatedUsername } })
+        Comment.destroy({
+          where: { id: commentId, username: authenticatedUsername },
+        })
           .then((numDeleted) => {
             if (numDeleted === 1) {
               Task.findByPk(taskId)
@@ -130,12 +144,13 @@ exports.delete = (req, res) => {
                     task.comment_count = Math.max(0, task.comment_count - 1);
                     return task.save();
                   } else {
-                    return Promise.reject(
-                      `Associated Task with id=${taskId} not found.`
-                    );
+                    const message = `Associated Task with id=${taskId} not found.`;
+                    logger.error(message);
+                    return Promise.reject(message);
                   }
                 })
                 .catch((error) => {
+                  logger.error(error);
                   res.send({
                     message: `Comment was deleted, but ${error}`,
                   });
@@ -149,9 +164,9 @@ exports.delete = (req, res) => {
                     );
                     return project.save();
                   } else {
-                    return Promise.reject(
-                      `Associated Project with id=${comment.project_id} not found`
-                    );
+                    const message = `Associated Project with id=${comment.project_id} not found`;
+                    logger.error(message);
+                    return Promise.reject(message);
                   }
                 })
                 .then(() => {
@@ -160,29 +175,31 @@ exports.delete = (req, res) => {
                   });
                 });
             } else {
+              const message = `Cannot delete Comment with id=${commentId}. Maybe Comment was not found...`;
+              logger.error(message);
               res.send({
-                message: `Cannot delete Comment with id=${commentId}. Maybe Comment was not found...`,
+                message: message,
               });
             }
           })
           .catch((err) => {
-            console.error(err);
+            logger.error(err);
             res.status(500).send({
               message: `Error occurred while deleting Comment with id=${commentId}.`,
             });
           });
       })
       .catch((err) => {
-        console.error(err);
+        logger.error(err);
+        const message = `Error occurred while finding Comment with id=${commentId}.`;
         res.status(500).send({
-          message: `Error occurred while finding Comment with id=${commentId}.`,
+          message: message,
         });
       });
   });
 };
 exports.findOne = (req, res) => {
   authJwt.verifyToken(req, res, () => {
-
     const authenticatedUsername = req.userId;
 
     const id = req.params.id;
@@ -192,14 +209,18 @@ exports.findOne = (req, res) => {
         if (data && data.username === authenticatedUsername) {
           res.send(data);
         } else {
+          const message = `Cannot find Comment with id=${id} or it does not belong to the authenticated user.`;
+          logger.error(message);
           res.status(404).send({
-            message: `Cannot find Comment with id=${id} or it does not belong to the authenticated user.`,
+            message: message,
           });
         }
       })
       .catch((err) => {
+        const message = "Error retrieving Comment with id=" + id;
+        logger.error(message);
         res.status(500).send({
-          message: "Error retrieving Comment with id=" + id,
+          message: message,
         });
       });
   });

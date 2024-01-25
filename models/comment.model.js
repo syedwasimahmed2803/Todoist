@@ -6,17 +6,18 @@ module.exports = (sequelize, Sequelize) => {
     },
     task_id: {
       type: Sequelize.STRING,
-      allowNull:false,
+      allowNull: false,
       references: {
-        model: 'tasks', 
-        key: 'id',
-      },},
+        model: "tasks",
+        key: "id",
+      },
+    },
     project_id: {
       type: Sequelize.STRING,
-      allowNull:false,
+      allowNull: false,
       references: {
-        model: 'projects',
-        key: 'id',
+        model: "projects",
+        key: "id",
       },
     },
     posted_at: {
@@ -31,11 +32,12 @@ module.exports = (sequelize, Sequelize) => {
     },
     username: {
       type: Sequelize.STRING,
-      allowNull:false,
+      allowNull: false,
       references: {
-        model: 'users', 
-        key: 'username',
-      },},
+        model: "users",
+        key: "username",
+      },
+    },
   });
 
   return Comment;
