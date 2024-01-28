@@ -1,6 +1,6 @@
 const { verifySignUp } = require("../middleware");
 const { signupSchema, signinSchema } = require("../Validations/validations.js");
-const validation = require("../middleware/validation.js");
+const validate = require("../middleware/validation.js");
 
 const controller = require("../controllers/auth.controller.js");
 
@@ -15,10 +15,10 @@ module.exports = function (app) {
 
   app.post(
     "/api/auth/signup",
-    validation(signupSchema),
+    validate(signupSchema),
     [verifySignUp.checkDuplicateUsernameOrEmail],
     controller.signup
   );
 
-  app.post("/api/auth/signin", validation(signinSchema), controller.signin);
+  app.post("/api/auth/signin", validate(signinSchema), controller.signin);
 };
