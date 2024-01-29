@@ -3,14 +3,7 @@ const yup = require("yup");
 const signupSchema = yup.object({
   username: yup.string().required(),
   email: yup.string().email().required(),
-  password: yup
-    .string()
-    .min(6)
-    .max(20)
-    .required()
-    .matches(/[a-z]/)
-    .matches(/[A-Z]/)
-    .matches(/\d/),
+  password: yup.string().min(6).max(20).required(),
 });
 
 const signinSchema = yup.object({

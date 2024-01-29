@@ -10,3 +10,12 @@
 2024-01-25 10:54:17 [33mwarn[39m: Unauthorized!
 2024-01-25 10:54:30 [31merror[39m: Cannot find Project with id=3. Project not found for the authenticated user.
 2024-01-25 10:55:22 [33mwarn[39m: Unauthorized! Invalid token
+2024-01-29 09:40:14 [31merror[39m: password must match the following: "/[a-z]/"
+2024-01-29 09:41:02 [31merror[39m: password must match the following: "/[a-z]/"
+2024-01-29 09:42:31 [31merror[39m: User Not found.
+2024-01-29 09:43:00 [33mwarn[39m: Unauthorized!
+2024-01-29 09:43:17 [33mwarn[39m: Unauthorized!
+2024-01-29 09:43:29 [33mwarn[39m: Unauthorized!
+2024-01-29 09:44:11 [31merror[39m: Content can not be empty!
+2024-01-29 09:44:46 [31merror[39m: Some error occurred while creating the Project.
+2024-01-29 09:45:09 [31merror[39m: name is a required field
